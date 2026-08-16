@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://justtellme.app/schemas/action_plan.schema.json",
+  "title": "ActionPlan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "plan_id",
+    "original_text",
+    "summary",
+    "actions",
+    "needs_clarification",
+    "confidence"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0" },
+    "plan_id": { "type": "string", "minLength": 1 },
+    "original_text": { "type": "string" },
+    "summary": { "type": "string" },
+    "actions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/action" }
+    },
+    "needs_clarification": { "type": "boolean" },
+    "clarification": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["prompt", "reason"],
+      "properties": {
+        "prompt": { "type": "string" },
+        "reason": {
+          "type": "string",
+          "enum": ["ambiguous_person", "ambiguous_time", "missing_recipient", "missing_permission_context", "unsupported"]
+        },
+        "options": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+  },
+  "$defs": {
+    "confirmation": {
+      "type": "string",
+      "enum": ["auto", "confirm", "handoff"]
+    },
+    "action_status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "awaiting_confirmation",
+        "executing",
+        "completed",
+        "handed_off",
+        "scheduled",
+        "failed",
+        "unsupported",
+        "cancelled"
+      ]
+    },
+    "action_type": {
+      "type": "string",
+      "enum": [
+        "CREATE_REMINDER",
+        "CREATE_TASK",
+        "COMPLETE_TASK",
+        "CREATE_CALENDAR_EVENT",
+        "UPDATE_CALENDAR_EVENT",
+        "DELETE_CALENDAR_EVENT",
+        "QUERY_CALENDAR",
+        "DRAFT_EMAIL",
+        "SEND_EMAIL",
+        "SEARCH_EMAIL",
+        "CALL_CONTACT",
+        "PREPARE_SMS",
+        "PREPARE_WHATSAPP",
+        "PREPARE_TELEGRAM",
+        "SHARE_MEDIA",
+        "SAVE_NOTE",
+        "QUERY_TASKS",
+        "QUERY_MEMORY"
+      ]
+    },
+    "recipient": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "contact_id": { "type": ["string", "null"] },
+        "display_name": { "type": ["string", "null"] },
+        "phone": { "type": ["string", "null"] },
+        "email": { "type": ["string", "null"] }
+      }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "status", "confirmation"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "type": { "$ref": "#/$defs/action_type" },
+        "status": { "$ref": "#/$defs/action_status" },
+        "confirmation": { "$ref": "#/$defs/confirmation" },
+        "title": { "type": ["string", "null"] },
+        "notes": { "type": ["string", "null"] },
+        "recipient": { "anyOf": [{ "$ref": "#/$defs/recipient" }, { "type": "null" }] },
+        "message": { "type": ["string", "null"] },
+        "subject": { "type": ["string", "null"] },
+        "start_at": { "type": ["string", "null"] },
+        "end_at": { "type": ["string", "null"] },
+        "scheduled_for": { "type": ["string", "null"] },
+        "remind_at": { "type": ["string", "null"] },
+        "query": { "type": ["string", "null"] },
+        "media_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "depends_on": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "metadata": { "type": "object" }
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+name: just_tell_me
+description: Say what you want done. Just Tell Me plans and completes what is safely possible.
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  http: ^1.2.2
+  intl: ^0.19.0
+  shared_preferences: ^2.3.3
+  url_launcher: ^6.3.1
+  uuid: ^4.5.1
+  flutter_local_notifications: ^17.2.4
+  timezone: ^0.9.4
+  permission_handler: ^11.3.1
+  flutter_contacts: ^1.1.9+2
+  device_calendar: ^4.3.3
+  google_fonts: ^6.2.1
+  speech_to_text: ^7.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true

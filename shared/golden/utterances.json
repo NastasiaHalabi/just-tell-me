@@ -1,0 +1,931 @@
+[
+  {
+    "id": "en-01",
+    "lang": "en",
+    "text": "Remind me tomorrow at 5 to pick up the car",
+    "expected_types": [
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "en-02",
+    "lang": "en",
+    "text": "Remind me in half an hour to drink water",
+    "expected_types": [
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "en-03",
+    "lang": "en",
+    "text": "Remind me after work to buy shampoo",
+    "expected_types": [
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "en-04",
+    "lang": "en",
+    "text": "Add a task to pay the electricity bill",
+    "expected_types": [
+      "CREATE_TASK"
+    ]
+  },
+  {
+    "id": "en-05",
+    "lang": "en",
+    "text": "Create a task to send invoices tonight",
+    "expected_types": [
+      "CREATE_TASK"
+    ]
+  },
+  {
+    "id": "en-06",
+    "lang": "en",
+    "text": "Mark the grocery task as done",
+    "expected_types": [
+      "COMPLETE_TASK"
+    ]
+  },
+  {
+    "id": "en-07",
+    "lang": "en",
+    "text": "Put a meeting with Maya Thursday at 2",
+    "expected_types": [
+      "CREATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "en-08",
+    "lang": "en",
+    "text": "Add a session with Joe tomorrow at 3pm",
+    "expected_types": [
+      "CREATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "en-09",
+    "lang": "en",
+    "text": "Move my meeting with Karim to Thursday",
+    "expected_types": [
+      "UPDATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "en-10",
+    "lang": "en",
+    "text": "Reschedule the meeting with Maya to 4pm",
+    "expected_types": [
+      "UPDATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "en-11",
+    "lang": "en",
+    "text": "Cancel the meeting with Karim",
+    "expected_types": [
+      "DELETE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "en-12",
+    "lang": "en",
+    "text": "Delete tomorrow's event with Maya",
+    "expected_types": [
+      "DELETE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "en-13",
+    "lang": "en",
+    "text": "What's on my calendar tomorrow?",
+    "expected_types": [
+      "QUERY_CALENDAR"
+    ]
+  },
+  {
+    "id": "en-14",
+    "lang": "en",
+    "text": "What is on my schedule today?",
+    "expected_types": [
+      "QUERY_CALENDAR"
+    ]
+  },
+  {
+    "id": "en-15",
+    "lang": "en",
+    "text": "Draft an email to Karim that the report is done",
+    "expected_types": [
+      "DRAFT_EMAIL"
+    ]
+  },
+  {
+    "id": "en-16",
+    "lang": "en",
+    "text": "Tomorrow email Karim that the report is done",
+    "expected_types": [
+      "SEND_EMAIL"
+    ]
+  },
+  {
+    "id": "en-17",
+    "lang": "en",
+    "text": "Send an email to Sara I'm running late",
+    "expected_types": [
+      "SEND_EMAIL"
+    ]
+  },
+  {
+    "id": "en-18",
+    "lang": "en",
+    "text": "Search email for invoice from last week",
+    "expected_types": [
+      "SEARCH_EMAIL"
+    ]
+  },
+  {
+    "id": "en-19",
+    "lang": "en",
+    "text": "Call Maya",
+    "expected_types": [
+      "CALL_CONTACT"
+    ]
+  },
+  {
+    "id": "en-20",
+    "lang": "en",
+    "text": "Call my boss",
+    "expected_types": [
+      "CALL_CONTACT"
+    ]
+  },
+  {
+    "id": "en-21",
+    "lang": "en",
+    "text": "Text Nour that I'm downstairs",
+    "expected_types": [
+      "PREPARE_SMS"
+    ]
+  },
+  {
+    "id": "en-22",
+    "lang": "en",
+    "text": "Send Nour a WhatsApp asking if she wants a session at 3",
+    "expected_types": [
+      "PREPARE_WHATSAPP"
+    ]
+  },
+  {
+    "id": "en-23",
+    "lang": "en",
+    "text": "Ask Nour if she wants a session at 3",
+    "expected_types": [
+      "PREPARE_WHATSAPP"
+    ]
+  },
+  {
+    "id": "en-24",
+    "lang": "en",
+    "text": "Send this on Telegram to Karim",
+    "expected_types": [
+      "PREPARE_TELEGRAM"
+    ]
+  },
+  {
+    "id": "en-25",
+    "lang": "en",
+    "text": "Send the last photo to Maya",
+    "expected_types": [
+      "SHARE_MEDIA"
+    ]
+  },
+  {
+    "id": "en-26",
+    "lang": "en",
+    "text": "Save a note that the lockbox code changed",
+    "expected_types": [
+      "SAVE_NOTE"
+    ]
+  },
+  {
+    "id": "en-27",
+    "lang": "en",
+    "text": "What am I forgetting this week?",
+    "expected_types": [
+      "QUERY_TASKS"
+    ]
+  },
+  {
+    "id": "en-28",
+    "lang": "en",
+    "text": "What tasks do I still have?",
+    "expected_types": [
+      "QUERY_TASKS"
+    ]
+  },
+  {
+    "id": "en-29",
+    "lang": "en",
+    "text": "Who is mama in my memory?",
+    "expected_types": [
+      "QUERY_MEMORY"
+    ]
+  },
+  {
+    "id": "en-30",
+    "lang": "en",
+    "text": "Tomorrow email Karim that the report is done and put a meeting with Maya Thursday at 2",
+    "expected_types": [
+      "SEND_EMAIL",
+      "CREATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "ar-01",
+    "lang": "ar",
+    "text": "ذكرني بكرا عالخمسة جيب السيارة",
+    "expected_types": [
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "ar-02",
+    "lang": "ar",
+    "text": "ذكرني بعد شوي أشرب مي",
+    "expected_types": [
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "ar-03",
+    "lang": "ar",
+    "text": "ذكرني بعد الشغل جيب شامبو",
+    "expected_types": [
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "ar-04",
+    "lang": "ar",
+    "text": "ضيف مهمة دفع الكهرباء",
+    "expected_types": [
+      "CREATE_TASK"
+    ]
+  },
+  {
+    "id": "ar-05",
+    "lang": "ar",
+    "text": "مهمة: ابعت الفواتير",
+    "expected_types": [
+      "CREATE_TASK"
+    ]
+  },
+  {
+    "id": "ar-06",
+    "lang": "ar",
+    "text": "خلصت مهمة البقالة",
+    "expected_types": [
+      "COMPLETE_TASK"
+    ]
+  },
+  {
+    "id": "ar-07",
+    "lang": "ar",
+    "text": "حط جلسة مع مايا الخميس الساعة 2",
+    "expected_types": [
+      "CREATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "ar-08",
+    "lang": "ar",
+    "text": "ضيف موعد مع جو بكرا الساعة 3",
+    "expected_types": [
+      "CREATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "ar-09",
+    "lang": "ar",
+    "text": "غير الموعد مع كريم على الخميس",
+    "expected_types": [
+      "UPDATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "ar-10",
+    "lang": "ar",
+    "text": "أجل الاجتماع مع مايا للساعة 4",
+    "expected_types": [
+      "UPDATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "ar-11",
+    "lang": "ar",
+    "text": "الغي الاجتماع مع كريم",
+    "expected_types": [
+      "DELETE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "ar-12",
+    "lang": "ar",
+    "text": "امسح حدث بكرا مع مايا",
+    "expected_types": [
+      "DELETE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "ar-13",
+    "lang": "ar",
+    "text": "شو عندي بكرا؟",
+    "expected_types": [
+      "QUERY_CALENDAR"
+    ]
+  },
+  {
+    "id": "ar-14",
+    "lang": "ar",
+    "text": "شو عندي اليوم؟",
+    "expected_types": [
+      "QUERY_CALENDAR"
+    ]
+  },
+  {
+    "id": "ar-15",
+    "lang": "ar",
+    "text": "اكتب ايميل لكريم إن التقرير جاهز",
+    "expected_types": [
+      "DRAFT_EMAIL"
+    ]
+  },
+  {
+    "id": "ar-16",
+    "lang": "ar",
+    "text": "ابعت ايميل لكريم إن التقرير خلص",
+    "expected_types": [
+      "SEND_EMAIL"
+    ]
+  },
+  {
+    "id": "ar-17",
+    "lang": "ar",
+    "text": "ابعت ايميل لسارة إني رح إتأخر",
+    "expected_types": [
+      "SEND_EMAIL"
+    ]
+  },
+  {
+    "id": "ar-18",
+    "lang": "ar",
+    "text": "دور عالايميل على الفاتورة",
+    "expected_types": [
+      "SEARCH_EMAIL"
+    ]
+  },
+  {
+    "id": "ar-19",
+    "lang": "ar",
+    "text": "دق لمايا",
+    "expected_types": [
+      "CALL_CONTACT"
+    ]
+  },
+  {
+    "id": "ar-20",
+    "lang": "ar",
+    "text": "دق للمعلم",
+    "expected_types": [
+      "CALL_CONTACT"
+    ]
+  },
+  {
+    "id": "ar-21",
+    "lang": "ar",
+    "text": "ابعت رسالة نصية لنور إني تحت",
+    "expected_types": [
+      "PREPARE_SMS"
+    ]
+  },
+  {
+    "id": "ar-22",
+    "lang": "ar",
+    "text": "اسأل نور إذا بدها جلسة الساعة 3",
+    "expected_types": [
+      "PREPARE_WHATSAPP"
+    ]
+  },
+  {
+    "id": "ar-23",
+    "lang": "ar",
+    "text": "ابعت لواتساب لنور إذا بدها جلسة",
+    "expected_types": [
+      "PREPARE_WHATSAPP"
+    ]
+  },
+  {
+    "id": "ar-24",
+    "lang": "ar",
+    "text": "ابعت لتلغرام لكريم",
+    "expected_types": [
+      "PREPARE_TELEGRAM"
+    ]
+  },
+  {
+    "id": "ar-25",
+    "lang": "ar",
+    "text": "ابعت الصورة لمايا",
+    "expected_types": [
+      "SHARE_MEDIA"
+    ]
+  },
+  {
+    "id": "ar-26",
+    "lang": "ar",
+    "text": "سجل إنو رمز الصندوق تغير",
+    "expected_types": [
+      "SAVE_NOTE"
+    ]
+  },
+  {
+    "id": "ar-27",
+    "lang": "ar",
+    "text": "شو نسيت هالأسبوع؟",
+    "expected_types": [
+      "QUERY_TASKS"
+    ]
+  },
+  {
+    "id": "ar-28",
+    "lang": "ar",
+    "text": "شو المهام الباقية؟",
+    "expected_types": [
+      "QUERY_TASKS"
+    ]
+  },
+  {
+    "id": "ar-29",
+    "lang": "ar",
+    "text": "مين ماما بالذاكرة؟",
+    "expected_types": [
+      "QUERY_MEMORY"
+    ]
+  },
+  {
+    "id": "ar-30",
+    "lang": "ar",
+    "text": "بكرا ابعت ايميل لكريم إن التقرير جاهز وحط اجتماع مع مايا الخميس الساعة 2",
+    "expected_types": [
+      "SEND_EMAIL",
+      "CREATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "az-01",
+    "lang": "arabizi",
+    "text": "zakirne bokra 3al 5 jib l siyara mn 3end l mecanicien",
+    "expected_types": [
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "az-02",
+    "lang": "arabizi",
+    "text": "zakirne ba3d shway shrab may",
+    "expected_types": [
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "az-03",
+    "lang": "arabizi",
+    "text": "zakerni ba3d l shoghl jib shampoo",
+    "expected_types": [
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "az-04",
+    "lang": "arabizi",
+    "text": "zakirne today 3al 7 call the mechanic",
+    "expected_types": [
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "az-05",
+    "lang": "arabizi",
+    "text": "remind me bokra soboh jib l khebz",
+    "expected_types": [
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "az-06",
+    "lang": "arabizi",
+    "text": "zakirne masa 3al 8 study",
+    "expected_types": [
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "az-07",
+    "lang": "arabizi",
+    "text": "add task dfa3 l kahraba",
+    "expected_types": [
+      "CREATE_TASK"
+    ]
+  },
+  {
+    "id": "az-08",
+    "lang": "arabizi",
+    "text": "task: eb3at l invoices",
+    "expected_types": [
+      "CREATE_TASK"
+    ]
+  },
+  {
+    "id": "az-09",
+    "lang": "arabizi",
+    "text": "complete task groceries",
+    "expected_types": [
+      "COMPLETE_TASK"
+    ]
+  },
+  {
+    "id": "az-10",
+    "lang": "arabizi",
+    "text": "put meeting with Maya thursday at 2",
+    "expected_types": [
+      "CREATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "az-11",
+    "lang": "arabizi",
+    "text": "bokra 3ande meeting at 3, remind me abla bi nos se3a",
+    "expected_types": [
+      "CREATE_CALENDAR_EVENT",
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "az-12",
+    "lang": "arabizi",
+    "text": "session with Maya bokra 3al 3",
+    "expected_types": [
+      "CREATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "az-13",
+    "lang": "arabizi",
+    "text": "move meeting with Karim to thursday",
+    "expected_types": [
+      "UPDATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "az-14",
+    "lang": "arabizi",
+    "text": "reschedule meeting Maya to 4pm",
+    "expected_types": [
+      "UPDATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "az-15",
+    "lang": "arabizi",
+    "text": "cancel meeting with Karim",
+    "expected_types": [
+      "DELETE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "az-16",
+    "lang": "arabizi",
+    "text": "shu 3ande bokra?",
+    "expected_types": [
+      "QUERY_CALENDAR"
+    ]
+  },
+  {
+    "id": "az-17",
+    "lang": "arabizi",
+    "text": "shu 3andi today?",
+    "expected_types": [
+      "QUERY_CALENDAR"
+    ]
+  },
+  {
+    "id": "az-18",
+    "lang": "arabizi",
+    "text": "eb3at email la Karim enne ra7 et2akhar",
+    "expected_types": [
+      "SEND_EMAIL"
+    ]
+  },
+  {
+    "id": "az-19",
+    "lang": "arabizi",
+    "text": "Tomorrow email Karim that the report is done",
+    "expected_types": [
+      "SEND_EMAIL"
+    ]
+  },
+  {
+    "id": "az-20",
+    "lang": "arabizi",
+    "text": "draft email la Sara the report is ready",
+    "expected_types": [
+      "DRAFT_EMAIL"
+    ]
+  },
+  {
+    "id": "az-21",
+    "lang": "arabizi",
+    "text": "ابعت email لـ Karim وقله the report is ready",
+    "expected_types": [
+      "SEND_EMAIL"
+    ]
+  },
+  {
+    "id": "az-22",
+    "lang": "arabizi",
+    "text": "search email invoice",
+    "expected_types": [
+      "SEARCH_EMAIL"
+    ]
+  },
+  {
+    "id": "az-23",
+    "lang": "arabizi",
+    "text": "de2 Maya",
+    "expected_types": [
+      "CALL_CONTACT"
+    ]
+  },
+  {
+    "id": "az-24",
+    "lang": "arabizi",
+    "text": "call mama",
+    "expected_types": [
+      "CALL_CONTACT"
+    ]
+  },
+  {
+    "id": "az-25",
+    "lang": "arabizi",
+    "text": "de2 my boss",
+    "expected_types": [
+      "CALL_CONTACT"
+    ]
+  },
+  {
+    "id": "az-26",
+    "lang": "arabizi",
+    "text": "eb3at sms la Nour enne tahet",
+    "expected_types": [
+      "PREPARE_SMS"
+    ]
+  },
+  {
+    "id": "az-27",
+    "lang": "arabizi",
+    "text": "Ask Nour if she wants a session at 3",
+    "expected_types": [
+      "PREPARE_WHATSAPP"
+    ]
+  },
+  {
+    "id": "az-28",
+    "lang": "arabizi",
+    "text": "Bokra 3al 3 ask Maya if she wants a session",
+    "expected_types": [
+      "PREPARE_WHATSAPP"
+    ]
+  },
+  {
+    "id": "az-29",
+    "lang": "arabizi",
+    "text": "eb3at la Maya 3al whatsapp if she wants a session",
+    "expected_types": [
+      "PREPARE_WHATSAPP"
+    ]
+  },
+  {
+    "id": "az-30",
+    "lang": "arabizi",
+    "text": "ba3d l meeting send Maya a message",
+    "expected_types": [
+      "PREPARE_WHATSAPP"
+    ]
+  },
+  {
+    "id": "az-31",
+    "lang": "arabizi",
+    "text": "send telegram la Karim",
+    "expected_types": [
+      "PREPARE_TELEGRAM"
+    ]
+  },
+  {
+    "id": "az-32",
+    "lang": "arabizi",
+    "text": "send last photo to Maya",
+    "expected_types": [
+      "SHARE_MEDIA"
+    ]
+  },
+  {
+    "id": "az-33",
+    "lang": "arabizi",
+    "text": "save note lockbox code changed",
+    "expected_types": [
+      "SAVE_NOTE"
+    ]
+  },
+  {
+    "id": "az-34",
+    "lang": "arabizi",
+    "text": "what am i forgetting",
+    "expected_types": [
+      "QUERY_TASKS"
+    ]
+  },
+  {
+    "id": "az-35",
+    "lang": "arabizi",
+    "text": "shu neseet",
+    "expected_types": [
+      "CREATE_TASK"
+    ]
+  },
+  {
+    "id": "az-36",
+    "lang": "arabizi",
+    "text": "who is mama",
+    "expected_types": [
+      "QUERY_MEMORY"
+    ]
+  },
+  {
+    "id": "az-37",
+    "lang": "arabizi",
+    "text": "zakirne bokra 3al 5 and email Karim I'm late",
+    "expected_types": [
+      "CREATE_REMINDER",
+      "SEND_EMAIL"
+    ]
+  },
+  {
+    "id": "az-38",
+    "lang": "arabizi",
+    "text": "ask Nour if she wants a session and put it on my calendar thursday at 2",
+    "expected_types": [
+      "PREPARE_WHATSAPP",
+      "CREATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "az-39",
+    "lang": "arabizi",
+    "text": "eb3at la Karim enne ra7 et2akhar and zakirne ba3d shway",
+    "expected_types": [
+      "PREPARE_WHATSAPP",
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "az-40",
+    "lang": "arabizi",
+    "text": "shu 3ande bokra and remind me to buy shampoo after work",
+    "expected_types": [
+      "QUERY_CALENDAR",
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "az-41",
+    "lang": "arabizi",
+    "text": "call Maya and ask Nour if she wants a session at 3",
+    "expected_types": [
+      "CALL_CONTACT",
+      "PREPARE_WHATSAPP"
+    ]
+  },
+  {
+    "id": "az-42",
+    "lang": "arabizi",
+    "text": "create task buy milk and remind me bokra 3al 9",
+    "expected_types": [
+      "CREATE_TASK",
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "az-43",
+    "lang": "arabizi",
+    "text": "put meeting with Karim tomorrow at 10am",
+    "expected_types": [
+      "CREATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "az-44",
+    "lang": "arabizi",
+    "text": "delete event with Maya",
+    "expected_types": [
+      "DELETE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "az-45",
+    "lang": "arabizi",
+    "text": "move my meeting with Karim tomorrow from 2 to 3",
+    "expected_types": [
+      "UPDATE_CALENDAR_EVENT"
+    ]
+  },
+  {
+    "id": "az-46",
+    "lang": "arabizi",
+    "text": "email George tomorrow at 9",
+    "expected_types": [
+      "SEND_EMAIL"
+    ]
+  },
+  {
+    "id": "az-47",
+    "lang": "arabizi",
+    "text": "zakirne jib l siyara",
+    "expected_types": [
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "az-48",
+    "lang": "arabizi",
+    "text": "hala2 remind me in half an hour",
+    "expected_types": [
+      "CREATE_REMINDER"
+    ]
+  },
+  {
+    "id": "az-49",
+    "lang": "arabizi",
+    "text": "send photo to Nour",
+    "expected_types": [
+      "SHARE_MEDIA"
+    ]
+  },
+  {
+    "id": "az-50",
+    "lang": "arabizi",
+    "text": "telegram Karim I'm downstairs",
+    "expected_types": [
+      "PREPARE_TELEGRAM"
+    ]
+  },
+  {
+    "id": "az-51",
+    "lang": "arabizi",
+    "text": "sms Nour I'm late",
+    "expected_types": [
+      "PREPARE_SMS"
+    ]
+  },
+  {
+    "id": "az-52",
+    "lang": "arabizi",
+    "text": "draft email to my boss I'm sick",
+    "expected_types": [
+      "DRAFT_EMAIL"
+    ]
+  },
+  {
+    "id": "az-53",
+    "lang": "arabizi",
+    "text": "what's on my calendar bokra",
+    "expected_types": [
+      "QUERY_CALENDAR"
+    ]
+  },
+  {
+    "id": "az-54",
+    "lang": "arabizi",
+    "text": "complete task study",
+    "expected_types": [
+      "COMPLETE_TASK"
+    ]
+  },
+  {
+    "id": "az-55",
+    "lang": "arabizi",
+    "text": "save note Maya prefers whatsapp",
+    "expected_types": [
+      "SAVE_NOTE"
+    ]
+  }
+]

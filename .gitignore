@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+backend/.venv/
+backend/*.db
+.env
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Flutter / Dart
+mobile/.dart_tool/
+mobile/.packages
+mobile/build/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+*.iml
+.idea/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.cursor/plugins/
+

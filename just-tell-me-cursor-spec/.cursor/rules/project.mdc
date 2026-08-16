@@ -1,0 +1,18 @@
+---
+description: Core rules for the Just Tell Me mobile assistant project
+alwaysApply: true
+---
+
+Read `CURSOR_CONTEXT.md`, `ADR.md`, and `REQUIREMENTS.md` before substantial implementation work.
+
+Never let LLM-generated text directly invoke arbitrary functions. Validate a versioned ActionPlan and map known action enums to registered handlers.
+
+Every external side effect must pass the confirmation policy engine.
+
+Never report an external action as completed unless the OS/API confirms it. WhatsApp/Telegram handoffs are `handed_off` unless an official API reports a send result.
+
+Do not implement core product functionality using simulated taps, screen scraping, accessibility-service automation, or private APIs.
+
+Keep secrets and OAuth credentials out of source control. Use secure storage and environment variables.
+
+Add tests with each feature. Do not continue to the next PLAN.md milestone if the current milestone does not build and pass its tests.
