@@ -511,7 +511,7 @@ class _CommandScreenState extends State<CommandScreen> {
               color: _state == CommandUiState.listening ? AppColors.gold : AppColors.forest,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.forest.withValues(alpha: 0.22),
+                  color: AppColors.forest.withOpacity(0.22),
                   blurRadius: 28,
                   offset: const Offset(0, 12),
                 ),
@@ -587,7 +587,7 @@ class _CommandScreenState extends State<CommandScreen> {
         color: AppColors.card,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(color: AppColors.forest.withValues(alpha: 0.06), blurRadius: 18, offset: const Offset(0, 8)),
+          BoxShadow(color: AppColors.forest.withOpacity(0.06), blurRadius: 18, offset: const Offset(0, 8)),
         ],
       ),
       child: Column(

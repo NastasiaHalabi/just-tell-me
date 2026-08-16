@@ -17,7 +17,7 @@ Future<void> main() async {
   } catch (_) {
     notifications = null;
   }
-    final api = this.api ?? JustTellMeApi();
+  final api = JustTellMeApi();
   await api.loadSavedUrl();
   runApp(JustTellMeApp(notifications: notifications, api: api));
 }
@@ -30,13 +30,13 @@ class JustTellMeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final api = this.api ?? JustTellMeApi();
+    final client = api ?? JustTellMeApi();
     return MaterialApp(
       title: 'Just Tell Me',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
       home: CommandScreen(
-        api: api,
+        api: client,
         notifications: notifications,
         contacts: DeviceContactDirectory(),
         calendar: NativeCalendarAdapter(),
