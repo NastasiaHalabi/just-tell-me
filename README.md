@@ -46,7 +46,9 @@ flutter run -d windows --dart-define=API_BASE_URL=http://127.0.0.1:8080
 
 ## Try it on a Samsung S23
 
-The phone must reach the planner on your PC. USB debugging installs the app; Wi‑Fi lets it call the API.
+After CI finishes, a preview APK is on [GitHub Releases](https://github.com/NastasiaHalabi/just-tell-me/releases/tag/android-preview). Download `app-debug.apk`, open it on the phone, and allow install from Chrome/Files. Then set the planner URL in the app to `http://YOUR_PC_IP:8080`.
+
+USB debugging also works if you prefer `flutter run`:
 
 1. On the S23: **Settings → About phone → tap Build number 7 times** to unlock Developer options.
 2. **Settings → Developer options** → turn on **USB debugging**.
