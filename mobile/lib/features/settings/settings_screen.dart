@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../core/api/client.dart';
+import '../../theme/theme_controller.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key, required this.api});
+  const SettingsScreen({super.key, required this.api, this.themeController});
 
   final JustTellMeApi api;
+  final ThemeController? themeController;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -66,6 +68,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 8),
             Text(_status!),
           ],
+          const Divider(height: 36),
+          const Text('Appearance'),
+          const SizedBox(height: 10),
+          if (widget.themeController != null)
+            ListenableBuilder(
+              listenable: widget.themeController!,
+              builder: (context, _) {
+                return SegmentedButton<bool>(
+                  segments: const [
+                    ButtonSegment(value: true, label: Text('Dark'), icon: Icon(Icons.dark_mode_rounded)),
+                    ButtonSegment(value: false, label: Text('Light'), icon: Icon(Icons.light_mode_rounded)),
+                  ],
+                  selected: {widget.themeController!.isDark},
+                  onSelectionChanged: (selection) => widget.themeController!.setDark(selection.first),
+                );
+              },
+            ),
+          const SizedBox(height: 8),
+          const Text('Dark is black with lime accents. Light keeps the same lime on a white background.'),
           const Divider(height: 36),
           const ListTile(
             contentPadding: EdgeInsets.zero,

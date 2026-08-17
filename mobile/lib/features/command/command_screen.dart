@@ -13,6 +13,7 @@ import '../../core/storage/local_store.dart';
 import '../../integrations/contracts.dart';
 import '../../integrations/speech/speech_provider.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/theme_controller.dart';
 import '../history/history_screen.dart';
 import '../memory/memory_screen.dart';
 import '../settings/settings_screen.dart';
@@ -37,6 +38,7 @@ class CommandScreen extends StatefulWidget {
     this.contacts,
     this.calendar,
     this.speech,
+    this.themeController,
   });
 
   final JustTellMeApi api;
@@ -44,6 +46,7 @@ class CommandScreen extends StatefulWidget {
   final ContactDirectory? contacts;
   final CalendarAdapter? calendar;
   final SpeechToTextProvider? speech;
+  final ThemeController? themeController;
 
   @override
   State<CommandScreen> createState() => _CommandScreenState();
@@ -355,18 +358,12 @@ class _CommandScreenState extends State<CommandScreen> {
   @override
   Widget build(BuildContext context) {
     final arabic = RegExp(r'[\u0600-\u06FF]').hasMatch(_textController.text);
+    final palette = AppPalette.of(context);
     return Directionality(
       textDirection: arabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFFF7F2E8), Color(0xFFE9F0EA), Color(0xFFF4EFE6)],
-            ),
-          ),
-          child: SafeArea(
+        backgroundColor: palette.background,
+        body: SafeArea(
             child: Column(
               children: [
                 _topBar(),
@@ -374,9 +371,17 @@ class _CommandScreenState extends State<CommandScreen> {
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(22, 8, 22, 16),
                     children: [
-                      Text(_greeting, style: GoogleFonts.fraunces(fontSize: 32, height: 1.15, color: AppColors.forest)),
+                      Text.rich(
+                        TextSpan(
+                          style: GoogleFonts.inter(fontSize: 32, height: 1.15, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface),
+                          children: [
+                            TextSpan(text: '$_greeting,\n'),
+                            const TextSpan(text: 'just tell me.', style: TextStyle(color: limeAccent, fontStyle: FontStyle.italic)),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 6),
-                      Text(_statusLabel, style: const TextStyle(color: AppColors.muted, fontSize: 16)),
+                      Text(_statusLabel, style: TextStyle(color: palette.muted, fontSize: 16)),
                       const SizedBox(height: 28),
                       _micButton(),
                       const SizedBox(height: 22),
@@ -399,22 +404,23 @@ class _CommandScreenState extends State<CommandScreen> {
                       ],
                       if (_upcoming.isNotEmpty) ...[
                         const SizedBox(height: 24),
-                        Text('Coming up', style: GoogleFonts.fraunces(fontSize: 20, color: AppColors.forest)),
+                        Text('Coming up', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700)),
                         const SizedBox(height: 8),
                         ..._upcoming.map(_upcomingTile),
                       ],
                       if (_choices.isNotEmpty) ...[
                         const SizedBox(height: 20),
-                        Text('Which person?', style: GoogleFonts.fraunces(fontSize: 20, color: AppColors.forest)),
+                        Text('Which person?', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700)),
                         ..._choices.map(
                           (contact) => ListTile(
                             contentPadding: EdgeInsets.zero,
                             leading: CircleAvatar(
-                              backgroundColor: AppColors.sand,
+                              backgroundColor: limeAccent,
+                              foregroundColor: const Color(0xFF111111),
                               child: Text(contact.displayName.isEmpty ? '?' : contact.displayName[0].toUpperCase()),
                             ),
                             title: Text(contact.displayName),
-                            subtitle: Text(contact.phone ?? 'Pick in WhatsApp if needed'),
+                            subtitle: Text(contact.phone ?? 'Pick in WhatsApp if needed', style: TextStyle(color: palette.muted)),
                             onTap: () => _chooseContact(contact),
                           ),
                         ),
@@ -423,7 +429,7 @@ class _CommandScreenState extends State<CommandScreen> {
                         const SizedBox(height: 24),
                         Text(
                           _plan!.actions.length == 1 ? 'I understood this' : 'I understood ${_plan!.actions.length} things',
-                          style: GoogleFonts.fraunces(fontSize: 20, color: AppColors.forest),
+                          style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 10),
                         ..._plan!.actions.map(_actionCard),
@@ -441,14 +447,21 @@ class _CommandScreenState extends State<CommandScreen> {
                       ],
                       if (_recent.isNotEmpty) ...[
                         const SizedBox(height: 28),
-                        Text('Recent', style: GoogleFonts.fraunces(fontSize: 20, color: AppColors.forest)),
+                        Text('Recent', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700)),
                         const SizedBox(height: 8),
                         ..._recent.map(
                           (item) => Padding(
                             padding: const EdgeInsets.only(bottom: 10),
-                            child: Text(
-                              item.utterance,
-                              style: const TextStyle(color: AppColors.muted),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: palette.bubbleMine,
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                                child: Text(item.utterance, style: TextStyle(color: palette.bubbleMineText)),
+                              ),
                             ),
                           ),
                         ),
@@ -459,20 +472,37 @@ class _CommandScreenState extends State<CommandScreen> {
                 _composer(),
               ],
             ),
-          ),
         ),
       ),
     );
   }
 
   Widget _topBar() {
+    final theme = widget.themeController;
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
       child: Row(
         children: [
-          const SizedBox(width: 12),
-          Text('Just Tell Me', style: GoogleFonts.fraunces(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.forest)),
+          const CircleAvatar(
+            backgroundColor: limeAccent,
+            foregroundColor: Color(0xFF111111),
+            child: Icon(Icons.smart_toy_rounded),
+          ),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Just Tell Me', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700)),
+              const Text('Online', style: TextStyle(color: limeAccent, fontSize: 12, fontWeight: FontWeight.w600)),
+            ],
+          ),
           const Spacer(),
+          if (theme != null)
+            IconButton(
+              tooltip: theme.isDark ? 'Switch to light theme' : 'Switch to dark theme',
+              onPressed: () => theme.setDark(!theme.isDark),
+              icon: Icon(theme.isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
+            ),
           IconButton(
             tooltip: 'History',
             onPressed: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const HistoryScreen())),
@@ -487,7 +517,9 @@ class _CommandScreenState extends State<CommandScreen> {
             tooltip: 'Settings',
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute<void>(builder: (_) => SettingsScreen(api: widget.api)),
+              MaterialPageRoute<void>(
+                builder: (_) => SettingsScreen(api: widget.api, themeController: widget.themeController),
+              ),
             ),
             icon: const Icon(Icons.tune_rounded),
           ),
@@ -497,6 +529,7 @@ class _CommandScreenState extends State<CommandScreen> {
   }
 
   Widget _micButton() {
+    final listening = _state == CommandUiState.listening;
     return Center(
       child: Semantics(
         button: true,
@@ -508,19 +541,19 @@ class _CommandScreenState extends State<CommandScreen> {
             height: 124,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: _state == CommandUiState.listening ? AppColors.gold : AppColors.forest,
+              color: listening ? Colors.white : limeAccent,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.forest.withOpacity(0.22),
+                  color: limeAccent.withOpacity(0.35),
                   blurRadius: 28,
                   offset: const Offset(0, 12),
                 ),
               ],
             ),
             child: Icon(
-              _state == CommandUiState.listening ? Icons.graphic_eq_rounded : Icons.mic_rounded,
+              listening ? Icons.graphic_eq_rounded : Icons.mic_rounded,
               size: 46,
-              color: Colors.white,
+              color: const Color(0xFF111111),
             ),
           ),
         ),
@@ -529,9 +562,10 @@ class _CommandScreenState extends State<CommandScreen> {
   }
 
   Widget _chip(String label) {
+    final palette = AppPalette.of(context);
     return ActionChip(
       label: Text(label),
-      backgroundColor: AppColors.card,
+      backgroundColor: palette.surface,
       side: BorderSide.none,
       onPressed: () {
         _textController.text = label == 'Message Nour'
@@ -549,19 +583,19 @@ class _CommandScreenState extends State<CommandScreen> {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.forest,
+        color: limeAccent,
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Sending to ${_handoffLabel ?? 'them'}', style: const TextStyle(color: Colors.white70)),
+          Text('Sending to ${_handoffLabel ?? 'them'}', style: const TextStyle(color: Color(0xFF333333))),
           const SizedBox(height: 6),
           Text(
             seconds <= 0 ? 'Opening WhatsApp…' : 'in $seconds seconds',
-            style: GoogleFonts.fraunces(fontSize: 28, color: Colors.white),
+            style: GoogleFonts.inter(fontSize: 28, fontWeight: FontWeight.w800, color: const Color(0xFF111111)),
           ),
-          const Text('WhatsApp will open with a prepared hello. You still tap send.', style: TextStyle(color: Colors.white70)),
+          const Text('WhatsApp will open with a prepared hello. You still tap send.', style: TextStyle(color: Color(0xFF333333))),
         ],
       ),
     );
@@ -571,38 +605,36 @@ class _CommandScreenState extends State<CommandScreen> {
     final when = task.dueAt ?? task.reminderAt;
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: const Icon(Icons.schedule_rounded, color: AppColors.leaf),
+      leading: const Icon(Icons.schedule_rounded, color: limeAccent),
       title: Text(task.title),
       subtitle: Text(when == null ? '' : DateFormat('h:mm a').format(when.toLocal())),
     );
   }
 
   Widget _actionCard(PlannedAction action) {
+    final palette = AppPalette.of(context);
     final who = action.recipient?.displayName;
     final when = action.startAt ?? action.scheduledFor ?? action.remindAt;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(color: AppColors.forest.withOpacity(0.06), blurRadius: 18, offset: const Offset(0, 8)),
-        ],
+        color: palette.bubbleTheirs,
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(_friendlyType(action.type), style: const TextStyle(color: AppColors.leaf, fontWeight: FontWeight.w600)),
-          if (action.title != null) Text(action.title!, style: GoogleFonts.fraunces(fontSize: 20)),
-          if (who != null) Text('For $who', style: const TextStyle(color: AppColors.muted)),
+          Text(_friendlyType(action.type), style: const TextStyle(color: limeAccent, fontWeight: FontWeight.w600)),
+          if (action.title != null) Text(action.title!, style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, color: palette.bubbleTheirsText)),
+          if (who != null) Text('For $who', style: TextStyle(color: palette.muted)),
           if (action.message != null) ...[
             const SizedBox(height: 10),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(color: AppColors.cream, borderRadius: BorderRadius.circular(16)),
-              child: Text('“${action.message}”'),
+              decoration: BoxDecoration(color: palette.background, borderRadius: BorderRadius.circular(16)),
+              child: Text('“${action.message}”', style: TextStyle(color: palette.bubbleTheirsText)),
             ),
             Align(
               alignment: Alignment.centerRight,
@@ -617,10 +649,10 @@ class _CommandScreenState extends State<CommandScreen> {
               ),
             ),
           ],
-          if (when != null && action.message == null) Text(when, style: const TextStyle(color: AppColors.muted, fontSize: 12)),
+          if (when != null && action.message == null) Text(when, style: TextStyle(color: palette.muted, fontSize: 12)),
           if (_results[action.id] != null) ...[
             const SizedBox(height: 8),
-            Text(_results[action.id]!, style: const TextStyle(height: 1.35)),
+            Text(_results[action.id]!, style: TextStyle(height: 1.35, color: palette.bubbleTheirsText)),
           ],
         ],
       ),
@@ -628,6 +660,7 @@ class _CommandScreenState extends State<CommandScreen> {
   }
 
   Widget _composer() {
+    final palette = AppPalette.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Row(
@@ -639,17 +672,20 @@ class _CommandScreenState extends State<CommandScreen> {
               maxLines: 4,
               textInputAction: TextInputAction.send,
               onSubmitted: _submit,
-              decoration: const InputDecoration(hintText: 'Just tell me…'),
+              decoration: InputDecoration(
+                hintText: 'Type a message…',
+                fillColor: palette.surface,
+              ),
             ),
           ),
           const SizedBox(width: 10),
           Material(
-            color: AppColors.forest,
+            color: limeAccent,
             shape: const CircleBorder(),
             child: IconButton(
               tooltip: 'Send command',
               onPressed: () => _submit(_textController.text),
-              icon: const Icon(Icons.arrow_upward_rounded, color: Colors.white),
+              icon: const Icon(Icons.send_rounded, color: Color(0xFF111111)),
             ),
           ),
         ],
