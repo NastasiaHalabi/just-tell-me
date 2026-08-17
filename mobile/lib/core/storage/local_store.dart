@@ -9,9 +9,11 @@ class HistoryItem {
     required this.summary,
     required this.status,
     required this.timestamp,
+    String? id,
     this.error,
-  });
+  }) : id = id ?? const Uuid().v4();
 
+  final String id;
   final String utterance;
   final String summary;
   final String status;
@@ -19,6 +21,7 @@ class HistoryItem {
   final String? error;
 
   Map<String, dynamic> toJson() => {
+        'id': id,
         'utterance': utterance,
         'summary': summary,
         'status': status,
@@ -27,11 +30,14 @@ class HistoryItem {
       };
 
   factory HistoryItem.fromJson(Map<String, dynamic> json) {
+    final timestamp = DateTime.parse(json['timestamp'] as String);
+    final utterance = json['utterance'] as String;
     return HistoryItem(
-      utterance: json['utterance'] as String,
+      id: json['id'] as String? ?? '${timestamp.toIso8601String()}-$utterance',
+      utterance: utterance,
       summary: json['summary'] as String,
       status: json['status'] as String,
-      timestamp: DateTime.parse(json['timestamp'] as String),
+      timestamp: timestamp,
       error: json['error'] as String?,
     );
   }
@@ -42,18 +48,21 @@ class MemoryItem {
     required this.key,
     required this.value,
     this.contactId,
+    this.phone,
     this.preferredChannel,
   });
 
   final String key;
   final String value;
   final String? contactId;
+  final String? phone;
   final String? preferredChannel;
 
   Map<String, dynamic> toJson() => {
         'key': key,
         'value': value,
         'contact_id': contactId,
+        'phone': phone,
         'preferred_channel': preferredChannel,
       };
 
@@ -62,6 +71,7 @@ class MemoryItem {
       key: json['key'] as String,
       value: json['value'] as String,
       contactId: json['contact_id'] as String?,
+      phone: json['phone'] as String?,
       preferredChannel: json['preferred_channel'] as String?,
     );
   }
@@ -123,12 +133,17 @@ class LocalTask {
     );
   }
 
-  LocalTask copyWith({String? status}) {
+  LocalTask copyWith({
+    String? status,
+    String? title,
+    DateTime? dueAt,
+    DateTime? reminderAt,
+  }) {
     return LocalTask(
       id: id,
-      title: title,
-      dueAt: dueAt,
-      reminderAt: reminderAt,
+      title: title ?? this.title,
+      dueAt: dueAt ?? this.dueAt,
+      reminderAt: reminderAt ?? this.reminderAt,
       status: status ?? this.status,
       sourcePlanId: sourcePlanId,
       recurrence: recurrence,
@@ -154,6 +169,13 @@ class LocalStore {
     await prefs.setStringList(_historyKey, current.take(100).toList());
   }
 
+  Future<void> deleteHistory(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final items = await history();
+    items.removeWhere((row) => row.id == id);
+    await prefs.setStringList(_historyKey, items.map((row) => jsonEncode(row.toJson())).toList());
+  }
+
   Future<List<MemoryItem>> memory() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getStringList(_memoryKey) ?? [];
@@ -176,12 +198,22 @@ class LocalStore {
   }
 
   Future<MemoryItem?> findAlias(String phrase) async {
-    final needle = phrase.toLowerCase();
+    final needle = phrase.trim().toLowerCase();
+    if (needle.isEmpty) return null;
     final items = await memory();
+    MemoryItem? loose;
     for (final item in items) {
-      if (item.key.toLowerCase() == needle) return item;
+      final key = item.key.toLowerCase();
+      final value = item.value.toLowerCase();
+      if (key == needle || value == needle) return item;
+      if (key.contains(needle) ||
+          value.contains(needle) ||
+          needle.contains(key) ||
+          needle.contains(value)) {
+        loose ??= item;
+      }
     }
-    return null;
+    return loose;
   }
 
   Future<LocalTask> addTask({
@@ -219,6 +251,20 @@ class LocalStore {
         dueAt: json['due_at'] == null ? null : DateTime.tryParse(json['due_at'] as String),
       );
     }).toList();
+  }
+
+  Future<void> deleteTask(String id) async {
+    final items = await tasks();
+    items.removeWhere((task) => task.id == id);
+    await _saveTasks(items);
+  }
+
+  Future<void> updateTask(LocalTask updated) async {
+    final items = await tasks();
+    final index = items.indexWhere((task) => task.id == updated.id);
+    if (index < 0) return;
+    items[index] = updated;
+    await _saveTasks(items);
   }
 
   Future<void> completeMatching(String titleQuery) async {

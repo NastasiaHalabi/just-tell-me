@@ -187,7 +187,8 @@ class _CommandScreenState extends State<CommandScreen> {
           (item) => {
             'contact_id': item.contactId ?? 'memory:${item.key}',
             'display_name': item.value,
-            'aliases': [item.key],
+            'phone': item.phone,
+            'aliases': [item.key, item.value],
           },
         )
         .toList();
@@ -219,23 +220,44 @@ class _CommandScreenState extends State<CommandScreen> {
       );
       final names = plan.actions.map((action) => action.recipient?.displayName).whereType<String>();
       final name = names.isEmpty ? null : names.first;
-      if (name != null && widget.contacts != null) {
-        final found = await widget.contacts!.search(name);
-        if (found.length > 1) {
+      final needsPerson = plan.actions.any((action) => isMessagingHandoff(action.type) && action.recipient?.displayName != null);
+      if (needsPerson && name != null) {
+        final remembered = await _store.findAlias(name);
+        final knownPhone = (remembered?.phone ?? '').trim();
+        if (remembered != null && knownPhone.isNotEmpty) {
+          candidates = [
+            ...candidates,
+            {
+              'contact_id': remembered.contactId ?? 'memory:${remembered.key}',
+              'display_name': remembered.value,
+              'phone': remembered.phone,
+              'aliases': [remembered.key, remembered.value, name],
+            },
+          ];
+          plan = await widget.api.createPlan(
+            text: utterance,
+            localNow: DateTime.now(),
+            candidateContacts: candidates,
+          );
+          await _presentPlan(plan, identityConfirmed: true);
+          return;
+        }
+        if (widget.contacts != null) {
+          final found = await widget.contacts!.search(name);
+          if (found.isEmpty) {
+            setState(() {
+              _plan = plan;
+              _state = CommandUiState.failed;
+              _error = 'I don’t have $name in memory yet. Allow contacts and pick them once so I can message them later.';
+            });
+            return;
+          }
           setState(() {
             _plan = plan;
             _choices = found;
             _state = CommandUiState.awaitingConfirmation;
           });
           return;
-        }
-        if (found.length == 1) {
-          candidates = [...candidates, found.first.toPlannerJson()];
-          plan = await widget.api.createPlan(
-            text: utterance,
-            localNow: DateTime.now(),
-            candidateContacts: candidates,
-          );
         }
       }
       await _presentPlan(plan);
@@ -256,8 +278,9 @@ class _CommandScreenState extends State<CommandScreen> {
     }
   }
 
-  Future<void> _presentPlan(ActionPlan plan) async {
-    final needsConfirm = plan.actions.any(needsUserGoAhead) || plan.needsClarification;
+  Future<void> _presentPlan(ActionPlan plan, {bool identityConfirmed = false}) async {
+    final needsConfirm = plan.actions.any((action) => needsUserGoAhead(action, identityConfirmed: identityConfirmed)) ||
+        plan.needsClarification;
     setState(() {
       _plan = plan;
       _state = needsConfirm ? CommandUiState.awaitingConfirmation : CommandUiState.executing;
@@ -270,13 +293,7 @@ class _CommandScreenState extends State<CommandScreen> {
   Future<void> _chooseContact(DeviceContact contact) async {
     final utterance = _pendingUtterance;
     if (utterance == null) return;
-    await _store.upsertMemory(
-      MemoryItem(
-        key: contact.displayName.split(' ').first,
-        value: contact.displayName,
-        contactId: contact.id,
-      ),
-    );
+    await _rememberContact(contact.displayName.split(' ').first, contact);
     final candidates = [...await _memoryCandidates(), contact.toPlannerJson()];
     final plan = await widget.api.createPlan(
       text: utterance,
@@ -284,7 +301,18 @@ class _CommandScreenState extends State<CommandScreen> {
       candidateContacts: candidates,
     );
     setState(() => _choices = []);
-    await _presentPlan(plan);
+    await _presentPlan(plan, identityConfirmed: true);
+  }
+
+  Future<void> _rememberContact(String alias, DeviceContact contact) async {
+    await _store.upsertMemory(
+      MemoryItem(
+        key: alias,
+        value: contact.displayName,
+        contactId: contact.id,
+        phone: contact.phone,
+      ),
+    );
   }
 
   void _armDelayedHandoff(PlannedAction action, DateTime when) {
@@ -410,7 +438,12 @@ class _CommandScreenState extends State<CommandScreen> {
                       ],
                       if (_choices.isNotEmpty) ...[
                         const SizedBox(height: 20),
-                        Text('Which person?', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700)),
+                        Text(
+                          _plan!.actions.any((action) => action.scheduledFor != null)
+                              ? 'Who should I message when the time comes?'
+                              : 'Which person?',
+                          style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700),
+                        ),
                         ..._choices.map(
                           (contact) => ListTile(
                             contentPadding: EdgeInsets.zero,
@@ -449,22 +482,7 @@ class _CommandScreenState extends State<CommandScreen> {
                         const SizedBox(height: 28),
                         Text('Recent', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700)),
                         const SizedBox(height: 8),
-                        ..._recent.map(
-                          (item) => Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: palette.bubbleMine,
-                                  borderRadius: BorderRadius.circular(18),
-                                ),
-                                child: Text(item.utterance, style: TextStyle(color: palette.bubbleMineText)),
-                              ),
-                            ),
-                          ),
-                        ),
+                        ..._recent.map(_recentBubble),
                       ],
                     ],
                   ),
@@ -608,7 +626,174 @@ class _CommandScreenState extends State<CommandScreen> {
       leading: const Icon(Icons.schedule_rounded, color: limeAccent),
       title: Text(task.title),
       subtitle: Text(when == null ? '' : DateFormat('h:mm a').format(when.toLocal())),
+      onLongPress: () => _promptTaskActions(task),
     );
+  }
+
+  Widget _recentBubble(HistoryItem item) {
+    final palette = AppPalette.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: GestureDetector(
+          onLongPress: () => _promptRecentActions(item),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: palette.bubbleMine,
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Text(item.utterance, style: TextStyle(color: palette.bubbleMineText)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  bool get _workInProgress {
+    return _state == CommandUiState.planning ||
+        _state == CommandUiState.executing ||
+        _state == CommandUiState.listening ||
+        _state == CommandUiState.transcribing ||
+        _handoffIn != null;
+  }
+
+  Future<void> _promptRecentActions(HistoryItem item) async {
+    final canEdit = !_workInProgress;
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (canEdit)
+                ListTile(
+                  leading: const Icon(Icons.edit_rounded),
+                  title: const Text('Edit'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _textController.text = item.utterance;
+                    _textController.selection = TextSelection.collapsed(offset: item.utterance.length);
+                  },
+                ),
+              ListTile(
+                leading: const Icon(Icons.delete_outline_rounded),
+                title: const Text('Delete'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _store.deleteHistory(item.id);
+                  await _refresh();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _promptTaskActions(LocalTask task) async {
+    final canEdit = !_workInProgress;
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (canEdit)
+                ListTile(
+                  leading: const Icon(Icons.edit_rounded),
+                  title: const Text('Edit'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _editUpcomingTask(task);
+                  },
+                ),
+              ListTile(
+                leading: const Icon(Icons.delete_outline_rounded),
+                title: const Text('Delete'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _deleteUpcomingTask(task);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteUpcomingTask(LocalTask task) async {
+    await _store.deleteTask(task.id);
+    await widget.notifications?.cancel(task.id);
+    if (task.sourcePlanId != null) {
+      await widget.notifications?.cancel('wa-${task.sourcePlanId}');
+    }
+    if (_handoffIn != null) {
+      _handoffTimer?.cancel();
+      if (mounted) setState(() => _handoffIn = null);
+    }
+    await _refresh();
+  }
+
+  Future<void> _editUpcomingTask(LocalTask task) async {
+    final title = TextEditingController(text: task.title);
+    var when = task.dueAt ?? task.reminderAt;
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit task'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: title,
+                decoration: const InputDecoration(labelText: 'Title'),
+                autofocus: true,
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () async {
+                  final picked = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.fromDateTime(when ?? DateTime.now().add(const Duration(hours: 1))),
+                  );
+                  if (picked == null) return;
+                  final base = when ?? DateTime.now();
+                  when = DateTime(base.year, base.month, base.day, picked.hour, picked.minute);
+                },
+                child: const Text('Change time'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+            FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Save')),
+          ],
+        );
+      },
+    );
+    if (saved != true) {
+      title.dispose();
+      return;
+    }
+    final nextTitle = title.text.trim();
+    title.dispose();
+    if (nextTitle.isEmpty) return;
+    final updated = task.copyWith(title: nextTitle, dueAt: when, reminderAt: when);
+    await _store.updateTask(updated);
+    await widget.notifications?.cancel(task.id);
+    final reminderAt = when;
+    if (reminderAt != null) {
+      await widget.notifications?.ensurePermission();
+      await widget.notifications?.schedule(id: task.id, title: nextTitle, when: reminderAt);
+    }
+    await _refresh();
   }
 
   Widget _actionCard(PlannedAction action) {

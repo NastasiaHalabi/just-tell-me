@@ -19,6 +19,9 @@ mobile/.flutter-plugins-dependencies
 *.iml
 .idea/
 
+# Local USB copy of the sideload APK (do not commit binaries)
+apk/
+
 # OS / IDE
 .DS_Store
 Thumbs.db

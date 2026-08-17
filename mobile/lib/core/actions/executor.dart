@@ -2,6 +2,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../storage/local_store.dart';
 import '../../integrations/contracts.dart';
+import '../../integrations/messaging/whatsapp_handoff.dart';
 import 'models.dart';
 
 class ExecutionResult {
@@ -18,12 +19,14 @@ class ActionExecutor {
     this.notifications,
     this.contacts,
     this.calendar,
+    this.launch,
   });
 
   final LocalStore store;
   final NotificationScheduler? notifications;
   final ContactDirectory? contacts;
   final CalendarAdapter? calendar;
+  final Future<bool> Function(Uri uri)? launch;
 
   Future<ExecutionResult> execute(PlannedAction action, {String? planId, bool forceNow = false}) async {
     switch (action.type) {
@@ -260,11 +263,16 @@ class ActionExecutor {
       );
     }
     final composed = action.message ?? 'Hi';
-    final message = Uri.encodeComponent(composed);
-    final phone = (action.recipient?.phone ?? '').replaceAll(RegExp(r'\D'), '');
-    final uri = phone.isEmpty
-        ? Uri.parse('https://wa.me/?text=$message')
-        : Uri.parse('https://wa.me/$phone?text=$message');
+    final who = action.recipient?.displayName;
+    final phone = await _resolveWhatsAppPhone(action.recipient);
+    if (phone == null && who != null && await store.findAlias(who) != null) {
+      return ExecutionResult(
+        status: 'failed',
+        detail:
+            'I remember $who, but I don’t have a phone number for them yet, so I can’t open their WhatsApp chat.',
+      );
+    }
+    final uri = whatsAppHandoffUri(text: composed, phone: phone);
     final launched = await _tryLaunch(uri);
     if (!launched) {
       return ExecutionResult(
@@ -272,10 +280,48 @@ class ActionExecutor {
         detail: "WhatsApp couldn't be opened. Copy this instead:\n$composed",
       );
     }
+    final chat = phone == null ? 'WhatsApp' : 'the WhatsApp chat with $who';
     return ExecutionResult(
       status: 'handed_off',
-      detail: 'WhatsApp is open with “$composed”. It is not marked sent until you send it there.',
+      detail: '$chat is open with “$composed”. It is not marked sent until you tap send.',
     );
+  }
+
+  Future<String?> _resolveWhatsAppPhone(Recipient? recipient) async {
+    final fromPlan = whatsAppNumber(recipient?.phone);
+    if (fromPlan != null) return fromPlan;
+
+    final name = recipient?.displayName;
+    if (name == null || name.trim().isEmpty) return null;
+
+    final memory = await store.findAlias(name);
+    final fromMemory = whatsAppNumber(memory?.phone);
+    if (fromMemory != null) return fromMemory;
+
+    if (contacts == null) return null;
+    final queries = <String>{
+      name,
+      if (memory != null) memory.key,
+      if (memory != null) memory.value,
+    };
+    for (final query in queries) {
+      final found = await contacts!.search(query);
+      if (memory?.contactId != null) {
+        for (final contact in found) {
+          if (contact.id == memory!.contactId) {
+            return whatsAppNumber(contact.phone);
+          }
+        }
+      }
+      if (found.length == 1) {
+        return whatsAppNumber(found.first.phone);
+      }
+      final exact = found.where((contact) => contact.displayName.toLowerCase() == query.toLowerCase());
+      if (exact.length == 1) {
+        return whatsAppNumber(exact.first.phone);
+      }
+    }
+    return null;
   }
 
   Future<ExecutionResult> _telegram(PlannedAction action) async {
@@ -345,6 +391,7 @@ class ActionExecutor {
 
   Future<bool> _tryLaunch(Uri uri) async {
     try {
+      if (launch != null) return await launch!(uri);
       return await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (_) {
       return false;

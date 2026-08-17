@@ -48,6 +48,31 @@ def test_whatsapp_is_handoff_not_sent() -> None:
     assert action.status.value == "planned"
 
 
+def test_memory_candidate_phone_goes_on_whatsapp_recipient() -> None:
+    plan = plan_utterance(
+        PlanRequest(
+            text="eb3at la Maya 3al whatsapp",
+            client_local_datetime="2026-08-16T22:00:00+03:00",
+            timezone="Asia/Beirut",
+            context={
+                "candidate_contacts": [
+                    {
+                        "contact_id": "memory:maya",
+                        "display_name": "Maya Khoury",
+                        "phone": "+96170111222",
+                        "aliases": ["Maya", "mama"],
+                    }
+                ]
+            },
+        )
+    )
+    action = plan.actions[0]
+    assert action.type.value == "PREPARE_WHATSAPP"
+    assert action.recipient is not None
+    assert action.recipient.phone == "+96170111222"
+    assert action.recipient.display_name == "Maya Khoury"
+
+
 def test_email_send_requires_confirm() -> None:
     plan = plan_utterance(
         PlanRequest(

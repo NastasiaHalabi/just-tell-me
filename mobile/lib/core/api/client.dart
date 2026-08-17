@@ -43,7 +43,9 @@ class JustTellMeApi {
 
   Future<bool> health() async {
     try {
-      final response = await _client.get(Uri.parse('$baseUrl/health'));
+      final response = await _client
+          .get(Uri.parse('$baseUrl/health'))
+          .timeout(const Duration(seconds: 5));
       return response.statusCode == 200;
     } catch (_) {
       return false;

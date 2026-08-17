@@ -75,4 +75,5 @@ abstract class NotificationScheduler {
     required DateTime when,
     String? body,
   });
+  Future<void> cancel(String id);
 }

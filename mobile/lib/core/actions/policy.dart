@@ -31,7 +31,17 @@ String applyPolicyFloor(String actionType, String proposed) {
   return proposedRank >= floorRank ? proposed : floor;
 }
 
-bool needsUserGoAhead(PlannedAction action) {
+bool isMessagingHandoff(String actionType) {
+  return actionType == 'PREPARE_WHATSAPP' ||
+      actionType == 'PREPARE_SMS' ||
+      actionType == 'PREPARE_TELEGRAM';
+}
+
+/// WhatsApp stays a handoff (not marked sent). If the person is already in
+/// memory or the user just picked them, skip the extra "Go ahead" tap.
+bool needsUserGoAhead(PlannedAction action, {bool identityConfirmed = false}) {
   final policy = applyPolicyFloor(action.type, action.confirmation);
-  return policy != 'auto';
+  if (policy == 'auto') return false;
+  if (identityConfirmed && isMessagingHandoff(action.type)) return false;
+  return true;
 }

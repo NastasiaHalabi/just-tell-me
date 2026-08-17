@@ -73,4 +73,11 @@ class LocalNotificationScheduler implements NotificationScheduler {
       return false;
     }
   }
+
+  @override
+  Future<void> cancel(String id) async {
+    try {
+      await _plugin.cancel(id.hashCode);
+    } catch (_) {}
+  }
 }

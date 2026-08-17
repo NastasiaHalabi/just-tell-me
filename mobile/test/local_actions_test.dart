@@ -24,6 +24,9 @@ class FakeNotifications implements NotificationScheduler {
     scheduled = true;
     return true;
   }
+
+  @override
+  Future<void> cancel(String id) async {}
 }
 
 class DeniedCalendar implements CalendarAdapter {
@@ -102,5 +105,31 @@ void main() {
     );
     expect(result.status, 'failed');
     expect(result.detail.toLowerCase(), contains('permission'));
+  });
+
+  test('open tasks can be deleted and edited', () async {
+    final store = LocalStore();
+    final task = await store.addTask(
+      title: 'Message Maya',
+      dueAt: DateTime.now().add(const Duration(hours: 2)),
+    );
+    await store.updateTask(task.copyWith(title: 'Message Maya about the session'));
+    expect((await store.upcoming(DateTime.now())).single.title, 'Message Maya about the session');
+    await store.deleteTask(task.id);
+    expect(await store.upcoming(DateTime.now()), isEmpty);
+  });
+
+  test('recent history can be deleted', () async {
+    final store = LocalStore();
+    final item = HistoryItem(
+      utterance: 'Remind me later',
+      summary: 'Reminder',
+      status: 'completed',
+      timestamp: DateTime.now(),
+    );
+    await store.addHistory(item);
+    expect((await store.history()).single.utterance, 'Remind me later');
+    await store.deleteHistory(item.id);
+    expect(await store.history(), isEmpty);
   });
 }
