@@ -57,7 +57,25 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: flutter build apk --debug
+      - name: Build debug APK
+        run: |
+          set -euo pipefail
+          dest="build/app/outputs/flutter-apk"
+          mkdir -p "$dest"
+          flutter build apk --debug || true
+          if [ ! -f "$dest/app-debug.apk" ]; then
+            found="$(find "$(pwd)" "$(pwd)/android" "$(pwd)/build" -name 'app-debug.apk' 2>/dev/null | head -n 1 || true)"
+            echo "Flutter did not report the APK. Searching. Found: ${found:-none}"
+            if [ -n "${found:-}" ]; then
+              cp "$found" "$dest/app-debug.apk"
+            fi
+          fi
+          if [ ! -f "$dest/app-debug.apk" ]; then
+            echo "No app-debug.apk under mobile/"
+            find "$(pwd)" "$(pwd)/android" -name '*.apk' -print || true
+            exit 1
+          fi
+          ls -lh "$dest/app-debug.apk"
       - uses: actions/upload-artifact@v5
         with:
           name: just-tell-me-debug
