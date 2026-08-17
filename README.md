@@ -46,7 +46,7 @@ flutter run -d windows --dart-define=API_BASE_URL=http://127.0.0.1:8080
 
 ## Try it on a Samsung S23
 
-After CI finishes, a preview APK is on [GitHub Releases](https://github.com/NastasiaHalabi/just-tell-me/releases/tag/android-preview). Download `app-debug.apk`, open it on the phone, and allow install from Chrome/Files. Then set the planner URL in the app to `http://YOUR_PC_IP:8080`.
+After CI finishes, download the APK from the green **apk** job: [Actions](https://github.com/NastasiaHalabi/just-tell-me/actions) → open the latest run → **Artifacts** → `just-tell-me-debug` (unzip to get `app-debug.apk`). If GitHub Releases is up, it is also at [android-preview](https://github.com/NastasiaHalabi/just-tell-me/releases/tag/android-preview). Open the APK on the phone and allow install from Chrome/Files. Then set the planner URL in the app to `http://YOUR_PC_IP:8080`.
 
 USB debugging also works if you prefer `flutter run`:
 

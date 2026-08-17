@@ -80,15 +80,24 @@ jobs:
         with:
           name: just-tell-me-debug
           path: mobile/build/app/outputs/flutter-apk/app-debug.apk
-      - uses: softprops/action-gh-release@v2
-        with:
-          tag_name: android-preview
-          name: Android preview APK
-          body: |
-            Sideload `app-debug.apk` on your phone (not from Play Store).
-            After install, open Settings in the app and set the planner URL to `http://YOUR_PC_IP:8080`.
-          files: mobile/build/app/outputs/flutter-apk/app-debug.apk
-          make_latest: true
+      - name: Publish GitHub Release
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          apk="build/app/outputs/flutter-apk/app-debug.apk"
+          notes=$'Sideload `app-debug.apk` on your phone (not from Play Store).\nAfter install, open Settings in the app and set the planner URL to `http://YOUR_PC_IP:8080`.'
+          for attempt in 1 2 3 4 5 6; do
+            if gh release view android-preview >/dev/null 2>&1; then
+              gh release upload android-preview "$apk" --clobber && exit 0
+            else
+              gh release create android-preview "$apk" --title "Android preview APK" --notes "$notes" --latest && exit 0
+            fi
+            echo "Release API attempt ${attempt} failed; waiting for GitHub..."
+            sleep $((attempt * 20))
+          done
+          echo "GitHub Releases API is unavailable. Download the just-tell-me-debug artifact from this run instead."
+          exit 0
       - name: Show Flutter doctor on failure
         if: failure()
         run: flutter doctor -v
